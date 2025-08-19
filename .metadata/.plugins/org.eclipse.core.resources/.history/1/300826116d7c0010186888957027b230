@@ -1,0 +1,66 @@
+package com.example.demo.ServiceImpl;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.Service.UserService;
+import com.example.demo.dto.EmployeeDto;
+import com.example.demo.entity.Employee;
+import com.example.demo.repository.EmployeeRepository;
+import com.example.demo.structure.ResponseStructure;
+
+import ch.qos.logback.core.joran.util.beans.BeanUtil;
+
+@Service
+public class EmployeeServiceImpl implements UserService {
+	
+	@Autowired
+	private EmployeeRepository employeeRepository;
+	
+	@Autowired PasswordEncoder passwordEncoder;
+	
+	@Override
+	public ResponseStructure<String> registerEmployee(EmployeeDto employeeDto) {
+	    ResponseStructure<String> response = new ResponseStructure<>();
+
+	    // Check if name is already taken
+	    if (employeeRepository.existsByName(employeeDto.getName())) {
+	        response.setMessage("Employee name already registered");
+	        response.setSuccess(false);
+	        response.setData(null);
+	        return response;
+	    }
+
+	    // Check if email is already taken
+	    if (employeeRepository.existsByEmail(employeeDto.getEmail())) {
+	        response.setMessage("Email already registered");
+	        response.setSuccess(false);
+	        response.setData(null);
+	        return response;
+	    }
+
+	    // Convert DTO to entity
+	    Employee emp = new Employee();
+	    BeanUtils.copyProperties(employeeDto, emp);
+
+	    // Encrypt password before saving
+	    emp.setPassword(passwordEncoder.encode(employeeDto.getPassword()));
+
+	    // Save to DB
+	    employeeRepository.save(emp);
+
+	    // Prepare success response
+	    response.setMessage("Employee registered successfully");
+	    response.setSuccess(true);
+	    response.setData("Registration successful");
+
+	    return response;
+	}
+
+	
+	
+	}
+
+

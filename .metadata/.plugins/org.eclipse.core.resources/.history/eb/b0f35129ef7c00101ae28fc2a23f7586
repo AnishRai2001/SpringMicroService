@@ -1,0 +1,12 @@
+spring.application.name=JwtSecurity
+
+spring.datasource.url= jdbc:postgresql://localhost:5432/SpringMicroService
+spring.datasource.username=postgres
+spring.dataSource.password=root
+server.port=8081
+
+
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.show-sql=true 

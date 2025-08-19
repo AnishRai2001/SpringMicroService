@@ -1,0 +1,45 @@
+package com.example.demo.ServiceImpl;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.Service.UserService;
+import com.example.demo.dto.EmployeeDto;
+import com.example.demo.entity.Employee;
+import com.example.demo.repository.EmployeeRepository;
+import com.example.demo.structure.ResponseStructure;
+
+import ch.qos.logback.core.joran.util.beans.BeanUtil;
+
+@Service
+public class EmployeeServiceImpl implements UserService {
+	
+	@Autowired
+	private EmployeeRepository employeeRepository;
+
+	@Override
+	public EmployeeDto registerEmployee(EmployeeDto employeeDto) {
+		ResponseStructure<String>response=new ResponseStructure<>();
+		
+		if(employeeRepository.existsByUsername(employeeDto.getName())) {
+			  throw new RuntimeException("Employee already registered with name: " + employeeDto.getName());
+		}
+		if(employeeRepository.existsByEmail(employeeDto.getEmail())) {
+			  throw new RuntimeException("Employee already registered with name: " +employeeDto.getEmail());
+		}
+		
+		Employee emp = new Employee();
+		BeanUtils.copyProperties(employeeDto , emp);
+		
+		Employee savedEmployee=employeeRepository.save(emp);
+		
+		EmployeeDto resultDto=new EmployeeDto();
+		BeanUtils.copyProperties(savedEmployee, resultDto);
+		
+		return resultDto;
+		
+		
+	}
+
+}

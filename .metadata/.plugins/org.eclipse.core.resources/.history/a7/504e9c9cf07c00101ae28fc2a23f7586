@@ -1,0 +1,35 @@
+server:
+  port: 5555
+	
+cloud:
+   gateway:
+     routes:
+       - id: microservice1
+         uri: lb://MICROSERVICE-1
+         predicates:
+           - Path=/micro1/**
+         filters:
+           - RewritePath=/micro1/(?<segment>.*), /${segment}
+          
+
+       - id: microservice2
+         uri: lb://MICROSERVICE-2
+         predicates:
+           - Path=/micro3/**
+         filters:
+           - RewritePath=/micro3/(?<segment>.*), /${segment}
+
+       - id: api-gateway-1
+         uri: lb://API-GATEWAY-1
+         predicates:
+           - Path=/api1/**
+         filters:
+           - RewritePath=/api1/(?<segment>.*), /${segment}
+          
+       - id: auth-service
+         uri: lb://SPRINGJWTLOGIN-1
+         predicates:
+           - Path=/api/auth/**
+         filters:
+           - RewritePath=/api/auth/(?<segment>.*), /api/auth/${segment}
+

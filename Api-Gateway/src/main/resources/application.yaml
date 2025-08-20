@@ -6,7 +6,7 @@ spring:
     gateway:
       routes:
         - id: auth-service-app
-          uri: lb://JWTSECURITY
+          uri: lb://AUTHSERVICEAPP
           predicates:
             - Path=/auth/**
           filters:
@@ -18,6 +18,5 @@ spring:
             - Path=/micro1/**
           filters:
             - RewritePath=/micro1/(?<segment>.*), /${segment}
-						
 server:
   port: 5555

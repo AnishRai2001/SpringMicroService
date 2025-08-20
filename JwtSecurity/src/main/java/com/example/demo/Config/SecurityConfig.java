@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.example.demo.Service.CustomUserDetailsService;
+import com.example.demo.Service.JwtFilter;
 
 import jakarta.servlet.FilterChain;
 
@@ -23,6 +24,9 @@ public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+    
+    @Autowired
+    private JwtFilter jwtFilter;
 
     @Bean
     public AuthenticationManager authManager(AuthenticationConfiguration config) throws Exception {
@@ -51,7 +55,7 @@ public class SecurityConfig {
     					.anyRequest().authenticated()
     					)
     	.authenticationProvider(authProvider())
-    	//.addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+    	.addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
     	.build();
     }
 }

@@ -1,0 +1,29 @@
+package com.example.demo.controller;
+
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.example.demo.Service.UserService;
+import com.example.demo.dto.EmployeeDto;
+import com.example.demo.entity.Employee;
+
+@RestController
+@RequestMapping("/auth/v1/users")
+public class AuthController {
+
+    @Autowired
+    private UserService userService;
+ 
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<EmployeeDto> getUserByEmail(@PathVariable String email) {
+ Employee employee=  userService.findByEmail(email);
+ EmployeeDto dto = new EmployeeDto();
+ BeanUtils.copyProperties(employee, dto);
+
+ return ResponseEntity.ok(dto);
+    }
+}

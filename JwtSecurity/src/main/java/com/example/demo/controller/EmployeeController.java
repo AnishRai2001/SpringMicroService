@@ -1,3 +1,4 @@
+
 package com.example.demo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import com.example.demo.dto.LoginDto;
 import com.example.demo.structure.ResponseStructure;
 
 @RestController
-@RequestMapping("/api/employee")
+@RequestMapping("/auth/v1")
 public class EmployeeController {
 
     @Autowired

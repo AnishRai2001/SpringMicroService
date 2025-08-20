@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.demo.Service.UserService;
 import com.example.demo.dto.EmployeeDto;
 import com.example.demo.entity.Employee;
+import com.example.demo.exception.EmailNotFoundException;
 import com.example.demo.repository.EmployeeRepository;
 import com.example.demo.structure.ResponseStructure;
 
@@ -59,8 +60,12 @@ public class EmployeeServiceImpl implements UserService {
 	    return response;
 	}
 
-	
-	
+	@Override
+	public Employee findByEmail(String email) {
+	    return employeeRepository.findByEmail(email)
+	            .orElseThrow(() -> new EmailNotFoundException("Email not found: " + email));
 	}
+}
+
 
 

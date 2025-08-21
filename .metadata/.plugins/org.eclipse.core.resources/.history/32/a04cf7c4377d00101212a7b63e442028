@@ -1,0 +1,8 @@
+package com.example.demo.Service;
+
+import com.example.demo.dto.EmployeeDto;
+import com.example.demo.structure.ResponseStructure;
+
+public interface UserService {
+    public ResponseStructure<String> registerEmployee(EmployeeDto employeeDto);
+}

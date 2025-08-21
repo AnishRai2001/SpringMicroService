@@ -1,0 +1,9 @@
+package com.example.demo.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+
+@FeignClient(name="MICROSERVICE-2")
+public interface Client1 {
+	public String getMessage();
+
+}

@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
 @Component
 public class JwtAuthenticationFilter implements GlobalFilter, Ordered{
 
-	 private static final String SECRET_KEY = "secret12345";
+	 private static final String SECRET_KEY = "mysecretkey12345";
 
 	    private static final List<String> openApiEndpoints = List.of(
 	            "/auth/auth/v1/login",

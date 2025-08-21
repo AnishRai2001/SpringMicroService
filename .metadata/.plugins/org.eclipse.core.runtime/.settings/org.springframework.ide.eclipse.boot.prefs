@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
 org.springframework.ide.eclipse.boot.wizard.PopularityTracker.cloud-eureka=4
 org.springframework.ide.eclipse.boot.wizard.PopularityTracker.cloud-eureka-server=2
+org.springframework.ide.eclipse.boot.wizard.PopularityTracker.cloud-feign=1
 org.springframework.ide.eclipse.boot.wizard.PopularityTracker.cloud-gateway-reactive=1
 org.springframework.ide.eclipse.boot.wizard.PopularityTracker.data-jpa=4
 org.springframework.ide.eclipse.boot.wizard.PopularityTracker.devtools=5

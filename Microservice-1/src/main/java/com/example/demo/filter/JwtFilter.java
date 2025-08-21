@@ -1,50 +1,67 @@
 package com.example.demo.filter;
 
-import java.io.IOException;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.example.demo.Service.CustomUserDetailsService;
 import com.example.demo.Service.JwtService;
+import com.example.demo.client.AuthServiceFeignClient;
+import com.example.demo.dto.EmployeeDto;
+import com.example.demo.entity.Employee;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-public class JwtFilter extends OncePerRequestFilter{
-	
-	 private JwtService jwtService;    
-	   private CustomUserDetailsService userDetailsService; //
+import java.io.IOException;
+import java.util.Collections;
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		String authHeader=request.getHeader("Authorization");
-		String email=null;
-		String token=null;
-		
-		if(authHeader!=null && authHeader.startsWith("Bearer")) {
-		token=authHeader.substring(7);
-		
-		if (email!=null && SecurityContextHolder.getContext().getAuthentication()==null) {
-			 UserDetails userDetails=userDetailsService.loadUserByUsername(email);
-			 
-			  UsernamePasswordAuthenticationToken authentication =
-	                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+@Component
+public class JwtFilter extends OncePerRequestFilter {
 
-	            SecurityContextHolder.getContext().setAuthentication(authentication);
-	        }
+    @Autowired
+    private JwtService jwtService;
 
-	        filterChain.doFilter(request, response);
-		}
-		
-		}
-		
-		
-	}
+    @Autowired
+    private AuthServiceFeignClient authServiceFeignClient;
 
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+
+        final String authHeader = request.getHeader("Authorization");
+        String email = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            email = jwtService.validateTokenAndGetSubject(token);
+
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                try {
+                    EmployeeDto user = authServiceFeignClient.getUserByEmail(email, authHeader);
+
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    user, null, Collections.singleton(new SimpleGrantedAuthority(user.getRole())));
+
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+
+                } catch (Exception e) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
+}

@@ -1,0 +1,11 @@
+package com.example.demo.client;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
+
+@FeignClient(name = "JWTSECURITY") // <- Your auth service app name in Eureka
+public interface AuthServiceFeignClient {
+
+    @GetMapping("/auth/v1/users/email/{email}")
+    EmployeeDto getUserByEmail(@PathVariable("email") String email);
+}

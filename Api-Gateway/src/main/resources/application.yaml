@@ -6,7 +6,7 @@ spring:
     gateway:
       routes:
         - id: auth-service-app
-          uri: lb://AUTHSERVICEAPP
+          uri: lb://JWTSECURITY
           predicates:
             - Path=/auth/**
           filters:

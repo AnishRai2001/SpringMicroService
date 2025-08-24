@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
+	<item key="org.eclipse.jdt.ui.last.selected.jre.kind2" value="2"/>
+	<item key="org.eclipse.jdt.ui.last.selected.execution.enviroment" value="JavaSE-21"/>
 	<section name="org.eclipse.jdt.internal.ui.packageview.PackageExplorerPart">
 		<item key="group_libraries" value="true"/>
 		<item key="layout" value="2"/>
@@ -38,7 +40,7 @@
 		<item key="RemoveFinal" value="false"/>
 	</section>
 	<section name="DialogBounds_GetterSetterTreeSelectionDialog">
-		<item key="DIALOG_X_ORIGIN" value="510"/>
+		<item key="DIALOG_X_ORIGIN" value="244"/>
 		<item key="DIALOG_Y_ORIGIN" value="7"/>
 		<item key="DIALOG_WIDTH" value="530"/>
 		<item key="DIALOG_HEIGHT" value="718"/>
@@ -55,7 +57,7 @@
 		<item key="create_package_info_java" value="false"/>
 	</section>
 	<section name="NewInterfaceCreationWizard.dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="486"/>
+		<item key="DIALOG_X_ORIGIN" value="196"/>
 		<item key="DIALOG_Y_ORIGIN" value="50"/>
 		<item key="DIALOG_WIDTH" value="578"/>
 		<item key="DIALOG_HEIGHT" value="548"/>
@@ -77,5 +79,12 @@
 		<item key="updateTextualMatches" value="false"/>
 		<item key="updateQualifiedNames" value="false"/>
 		<item key="patterns" value="*"/>
+	</section>
+	<section name="JavaProjectWizard.dialogBounds">
+		<item key="DIALOG_X_ORIGIN" value="404"/>
+		<item key="DIALOG_Y_ORIGIN" value="7"/>
+		<item key="DIALOG_WIDTH" value="742"/>
+		<item key="DIALOG_HEIGHT" value="801"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
 	</section>
 </section>

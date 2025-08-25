@@ -44,25 +44,12 @@ public class PropertyService {
 		@Autowired
 		private S3Service s3Service;
 	
-		public PropertyService(PropertyRepository propertyRepository, AreaRepository areaRepository,
-				CityRepository cityRepository, StateRepository stateRepository, RoomRepository roomRepository,
-				RoomAvailabilityRepository availabilityRepository) {
-			super();
-			this.propertyRepository = propertyRepository;
-			this.areaRepository = areaRepository;
-			this.cityRepository = cityRepository;
-			this.stateRepository = stateRepository;
-			this.roomRepository = roomRepository;
-			this.availabilityRepository = availabilityRepository;
-		}
-		
-		
-			public PropertyDto addProperty(PropertyDto dto, MultipartFile[] files) {
-			    Area area = areaRepository.findByName(dto.getArea());
-			    City city = cityRepository.findByName(dto.getCity());
-			    State state = stateRepository.findByName(dto.getState());
-			    
-			Property property = new Property();
+		public PropertyDto addProperty(PropertyDto dto, MultipartFile[] files) {
+		    Area area = areaRepository.findByName(dto.getArea());
+		    City city = cityRepository.findByName(dto.getCity());
+		    State state = stateRepository.findByName(dto.getState());
+
+		    Property property = new Property();
 		    property.setName(dto.getName());
 		    property.setNumberOfBathrooms(dto.getNumberOfBathrooms());
 		    property.setNumberOfBeds(dto.getNumberOfBeds());
@@ -73,7 +60,8 @@ public class PropertyService {
 		    property.setState(state);
 
 		    Property savedProperty = propertyRepository.save(property);
-		    
+
+		    // Save rooms
 		    for (RoomsDto roomsDto : dto.getRooms()) {
 		        Rooms rooms = new Rooms();
 		        rooms.setProperty(savedProperty);
@@ -81,19 +69,21 @@ public class PropertyService {
 		        rooms.setBasePrice(roomsDto.getBasePrice());
 		        roomRepository.save(rooms);
 		    }
-		    
-		    List<String> fileUrls = s3Service.uploadFiles(files);
-		    for(String url:fileUrls) {
-		    	PropertyPhotos photo = new PropertyPhotos();
-		    	photo.setUrl(url);
-		    	photo.setProperty(savedProperty);
-		    	photosRepo.save(photo);
-		    }
- 
-		    
-			return savedProperty;
-		}
-		
-		
 
+		    // Upload files to S3
+		    List<String> fileUrls = s3Service.uploadFiles(files);
+
+		    // Optionally save image URLs to DB
+		    for (String url : fileUrls) {
+		        PropertyPhotos photo = new PropertyPhotos();
+		        photo.setProperty(savedProperty);
+		        photo.setUrl(url);
+		        photosRepo.save(photo);
+		    }
+
+		    // Add image URLs to DTO
+		    dto.setImageUrls(fileUrls);
+
+		    return dto;
+		}
 }

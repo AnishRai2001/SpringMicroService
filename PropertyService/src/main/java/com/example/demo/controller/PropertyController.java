@@ -38,7 +38,7 @@ public class PropertyController {
 		    try {
 		        dto = objectMapper.readValue(propertyJson, PropertyDto.class);  // Convert JSON string to PropertyDto
 		    } catch (JsonProcessingException e) {
-		        logger.error("Error parsing property JSON", e);
+		    
 		        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);  // Handle bad JSON
 		    }
 

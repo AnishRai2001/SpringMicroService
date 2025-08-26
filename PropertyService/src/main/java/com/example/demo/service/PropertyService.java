@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.dto.EmailRequest;
 import com.example.demo.dto.PropertyDto;
 import com.example.demo.dto.RoomsDto;
 import com.example.demo.enity.Area;
@@ -40,7 +41,8 @@ public class PropertyService {
 		private RoomAvailabilityRepository availabilityRepository;
 		@Autowired
 		private PropertyPhotoRepo photosRepo;
-		
+		@Autowired
+		private EmailProducer emailProducer;
 		@Autowired
 		private S3Service s3Service;
 	
@@ -83,6 +85,11 @@ public class PropertyService {
 
 		    // Add image URLs to DTO
 		    dto.setImageUrls(fileUrls);
+		    
+		    emailProducer.sendEmail(new EmailRequest(
+		    	    "pankaj.p.mutha14@gmail.com",
+		    	    "Property added!",
+		    	    "Your property has been successfully added."));
 
 		    return dto;
 		}

@@ -66,3 +66,5 @@
 0:02:24 Microsoft.Browser_Removed
 1:42:24 Memory Pressure: Moderate
 1:42:44 Memory Pressure: Moderate
+1:42:54 Memory Pressure: Moderate
+1:45:09 Microsoft.UnloadController.IsUnclosableApp_IsNotWebApp

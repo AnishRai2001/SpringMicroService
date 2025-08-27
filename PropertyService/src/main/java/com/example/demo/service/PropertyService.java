@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.constant.AppConstants;
 import com.example.demo.dto.EmailRequest;
 import com.example.demo.dto.PropertyDto;
 import com.example.demo.dto.RoomsDto;
@@ -25,72 +26,80 @@ import com.example.demo.repository.StateRepository;
 
 @Service
 public class PropertyService {
-	
 
-		@Autowired
-		private PropertyRepository propertyRepository;
-		@Autowired
-		private AreaRepository areaRepository;
-		@Autowired
-		private CityRepository cityRepository;
-		@Autowired
-		private StateRepository stateRepository;
-		@Autowired
-		private RoomRepository roomRepository;
-		@Autowired
-		private RoomAvailabilityRepository availabilityRepository;
-		@Autowired
-		private PropertyPhotoRepo photosRepo;
-		@Autowired
-		private EmailProducer emailProducer;
-		@Autowired
-		private S3Service s3Service;
-	
-		public PropertyDto addProperty(PropertyDto dto, MultipartFile[] files) {
-		    Area area = areaRepository.findByName(dto.getArea());
-		    City city = cityRepository.findByName(dto.getCity());
-		    State state = stateRepository.findByName(dto.getState());
+    @Autowired
+    private PropertyRepository propertyRepository;
 
-		    Property property = new Property();
-		    property.setName(dto.getName());
-		    property.setNumberOfBathrooms(dto.getNumberOfBathrooms());
-		    property.setNumberOfBeds(dto.getNumberOfBeds());
-		    property.setNumberOfRooms(dto.getNumberOfRooms());
-		    property.setNumberOfGuestAllowed(dto.getNumberOfGuestAllowed());
-		    property.setArea(area);
-		    property.setCity(city);
-		    property.setState(state);
+    @Autowired
+    private AreaRepository areaRepository;
 
-		    Property savedProperty = propertyRepository.save(property);
+    @Autowired
+    private CityRepository cityRepository;
 
-		    // Save rooms
-		    for (RoomsDto roomsDto : dto.getRooms()) {
-		        Rooms rooms = new Rooms();
-		        rooms.setProperty(savedProperty);
-		        rooms.setRoomType(roomsDto.getRoomType());
-		        rooms.setBasePrice(roomsDto.getBasePrice());
-		        roomRepository.save(rooms);
-		    }
+    @Autowired
+    private StateRepository stateRepository;
 
-		    // Upload files to S3
-		    List<String> fileUrls = s3Service.uploadFiles(files);
+    @Autowired
+    private RoomRepository roomRepository;
 
-		    // Optionally save image URLs to DB
-		    for (String url : fileUrls) {
-		        PropertyPhotos photo = new PropertyPhotos();
-		        photo.setProperty(savedProperty);
-		        photo.setUrl(url);
-		        photosRepo.save(photo);
-		    }
+    @Autowired
+    private RoomAvailabilityRepository availabilityRepository;
 
-		    // Add image URLs to DTO
-		    dto.setImageUrls(fileUrls);
-		    
-		    emailProducer.sendEmail(new EmailRequest(
-		    	    "pankaj.p.mutha14@gmail.com",
-		    	    "Property added!",
-		    	    "Your property has been successfully added."));
+    @Autowired
+    private PropertyPhotoRepo photosRepo;
 
-		    return dto;
-		}
+    @Autowired
+    private EmailProducer emailProducer;
+
+    @Autowired
+    private S3Service s3Service;
+
+    public PropertyDto addProperty(PropertyDto dto, MultipartFile[] files) {
+        Area area = areaRepository.findByName(dto.getArea());
+        City city = cityRepository.findByName(dto.getCity());
+        State state = stateRepository.findByName(dto.getState());
+
+        Property property = new Property();
+        property.setName(dto.getName());
+        property.setNumberOfBathrooms(dto.getNumberOfBathrooms());
+        property.setNumberOfBeds(dto.getNumberOfBeds());
+        property.setNumberOfRooms(dto.getNumberOfRooms());
+        property.setNumberOfGuestAllowed(dto.getNumberOfGuestAllowed());
+        property.setArea(area);
+        property.setCity(city);
+        property.setState(state);
+
+        Property savedProperty = propertyRepository.save(property);
+
+        // Save rooms
+        for (RoomsDto roomsDto : dto.getRooms()) {
+            Rooms rooms = new Rooms();
+            rooms.setProperty(savedProperty);
+            rooms.setRoomType(roomsDto.getRoomType());
+            rooms.setBasePrice(roomsDto.getBasePrice());
+            roomRepository.save(rooms);
+        }
+
+        // Send email via Kafka
+        EmailRequest request = new EmailRequest(
+            "anishrai146@gmail.com",
+            "Property added successfully",
+            "Your property details are live"
+        );
+        emailProducer.sendEmail(request);
+
+        // Upload files to S3 and save to DB
+        List<String> fileUrls = s3Service.uploadFiles(files);
+        for (String url : fileUrls) {
+            PropertyPhotos photo = new PropertyPhotos();
+            photo.setProperty(savedProperty);
+            photo.setUrl(url);
+            photosRepo.save(photo);
+        }
+
+        // Add image URLs to DTO for response
+        dto.setImageUrls(fileUrls);
+
+        return dto;
+    }
 }

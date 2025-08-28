@@ -4,6 +4,8 @@ package com.example.demo.enity;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -20,6 +22,7 @@ public class RoomAvailability {
 
     @ManyToOne
     @JoinColumn(name = "room_id")
+    @JsonBackReference(value = "room-availabilities")
     private Rooms room;
 
 	public long getId() {

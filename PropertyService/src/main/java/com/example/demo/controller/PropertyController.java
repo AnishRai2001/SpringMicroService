@@ -1,13 +1,16 @@
 package com.example.demo.controller;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.demo.dto.PropertyDto;
@@ -20,38 +23,43 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RequestMapping("/api/v1/property")
 public class PropertyController {
 
-	@Autowired
-	private PropertyService propertyService;
-	
-	@PostMapping(
-		    value = "/add-property",
-		    consumes = MediaType.MULTIPART_FORM_DATA_VALUE,  // Ensures the endpoint accepts multipart/form-data
-		    produces = MediaType.APPLICATION_JSON_VALUE
-		)
-		public ResponseEntity<ResponseStructure> addProperty(
-		        @RequestParam("property") String propertyJson,  // Use RequestParam to get the property as a raw JSON string
-		        @RequestParam("files") MultipartFile[] files) {  // Use RequestParam to handle files
-		
-		
-		  ObjectMapper objectMapper = new ObjectMapper();
-		    PropertyDto dto = null;
-		    try {
-		        dto = objectMapper.readValue(propertyJson, PropertyDto.class);  // Convert JSON string to PropertyDto
-		    } catch (JsonProcessingException e) {
-		    
-		        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);  // Handle bad JSON
-		    }
+    @Autowired
+    private PropertyService propertyService;
 
-		    
-		    // Process the property and files
-		    PropertyDto property = propertyService.addProperty(dto, files);
+    @PostMapping(
+        value = "/add-property",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<ResponseStructure<PropertyDto>> addProperty(
+            @RequestParam("property") String propertyJson,
+            @RequestParam("files") MultipartFile[] files) {
 
-		    // Create response object
-		    ResponseStructure<PropertyDto> response = new ResponseStructure<>();
-		    response.setMessage("Property added");
-		    response.setStatus(201);
-		    response.setData(property);
+        ObjectMapper objectMapper = new ObjectMapper();
+        PropertyDto dto;
 
-		    return new ResponseEntity<>(response, HttpStatus.CREATED);
-		}
+        try {
+            dto = objectMapper.readValue(propertyJson, PropertyDto.class);
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        PropertyDto savedProperty = propertyService.addProperty(dto, files);
+
+        ResponseStructure<PropertyDto> response = new ResponseStructure<>();
+        response.setMessage("Property added");
+        response.setStatus(201);
+        response.setData(savedProperty);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+	@GetMapping("/search")
+	public ResponseStructure searchProperty(
+	        @RequestParam String name,
+	        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+	) {
+	    ResponseStructure response = propertyService.searchProperty(name, date);
+	    return response;
+	}
 }

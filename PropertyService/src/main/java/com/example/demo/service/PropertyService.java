@@ -1,8 +1,11 @@
 package com.example.demo.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +26,7 @@ import com.example.demo.repository.PropertyRepository;
 import com.example.demo.repository.RoomAvailabilityRepository;
 import com.example.demo.repository.RoomRepository;
 import com.example.demo.repository.StateRepository;
+import com.example.demo.structure.ResponseStructure;
 
 @Service
 public class PropertyService {
@@ -102,4 +106,17 @@ public class PropertyService {
 
         return dto;
     }
-}
+
+	public ResponseStructure searchProperty(String city, LocalDate date) {
+		List<Property> properties = propertyRepository.searchProperty(city,date);
+		ResponseStructure<List<Property>> response = new ResponseStructure<>();
+		
+		response.setMessage("Search result");
+		response.setStatus(200);
+		response.setData(properties);
+		
+		return response;
+	}
+
+    }
+

@@ -2,6 +2,7 @@ package com.example.demo.enity;
 
 
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,16 +10,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
 @Entity
 @Table(name="rooms")
 public class Rooms {
 	
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -33,38 +35,48 @@ public class Rooms {
     @JsonBackReference
     private Property property;
 
-	public long getId() {
-		return id;
-	}
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomAvailability> availabilities = new ArrayList<>();
 
-	public String getRoomType() {
-		return roomType;
-	}
+    // Getters and Setters
 
-	public double getBasePrice() {
-		return basePrice;
-	}
+    public long getId() {
+        return id;
+    }
 
-	public Property getProperty() {
-		return property;
-	}
+    public String getRoomType() {
+        return roomType;
+    }
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    public double getBasePrice() {
+        return basePrice;
+    }
 
-	public void setRoomType(String roomType) {
-		this.roomType = roomType;
-	}
+    public Property getProperty() {
+        return property;
+    }
 
-	public void setBasePrice(double basePrice) {
-		this.basePrice = basePrice;
-	}
+    public List<RoomAvailability> getAvailabilities() {
+        return availabilities;
+    }
 
-	public void setProperty(Property property) {
-		this.property = property;
-	}
+    public void setId(long id) {
+        this.id = id;
+    }
 
-    
+    public void setRoomType(String roomType) {
+        this.roomType = roomType;
+    }
 
+    public void setBasePrice(double basePrice) {
+        this.basePrice = basePrice;
+    }
+
+    public void setProperty(Property property) {
+        this.property = property;
+    }
+
+    public void setAvailabilities(List<RoomAvailability> availabilities) {
+        this.availabilities = availabilities;
+    }
 }

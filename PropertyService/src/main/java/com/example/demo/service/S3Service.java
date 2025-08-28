@@ -22,7 +22,7 @@ public class S3Service {
     @Autowired
     private AmazonS3 amazonS3;
 
-    @Value("${aws.s3.bucket-name}")
+    @Value("${aws.s3.bucket}")
     private String bucketName;
 
     public List<String> uploadFiles(MultipartFile[] files) {

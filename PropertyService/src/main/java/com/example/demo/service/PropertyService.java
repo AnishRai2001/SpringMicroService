@@ -1,6 +1,7 @@
-package com.example.demo.service;
+ package com.example.demo.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.demo.constant.AppConstants;
+
 import com.example.demo.dto.EmailRequest;
 import com.example.demo.dto.PropertyDto;
 import com.example.demo.dto.RoomsDto;
@@ -52,8 +53,8 @@ public class PropertyService {
     @Autowired
     private PropertyPhotoRepo photosRepo;
 
-    @Autowired
-    private EmailProducer emailProducer;
+//    @Autowired
+//    private EmailProducer emailProducer;
 
     @Autowired
     private S3Service s3Service;
@@ -75,24 +76,26 @@ public class PropertyService {
 
         Property savedProperty = propertyRepository.save(property);
 
-        // Save rooms
+        // ✅ Save rooms and return their IDs in DTO
+        List<RoomsDto> savedRoomDtos = new ArrayList<>();
         for (RoomsDto roomsDto : dto.getRooms()) {
             Rooms rooms = new Rooms();
             rooms.setProperty(savedProperty);
             rooms.setRoomType(roomsDto.getRoomType());
             rooms.setBasePrice(roomsDto.getBasePrice());
-            roomRepository.save(rooms);
+
+            Rooms savedRoom = roomRepository.save(rooms);
+
+            RoomsDto savedDto = new RoomsDto();
+            savedDto.setId(savedRoom.getId());
+            savedDto.setRoomType(savedRoom.getRoomType());
+            savedDto.setBasePrice(savedRoom.getBasePrice());
+
+            savedRoomDtos.add(savedDto);
         }
+        dto.setRooms(savedRoomDtos);
 
-        // Send email via Kafka
-        EmailRequest request = new EmailRequest(
-            "anishrai146@gmail.com",
-            "Property added successfully",
-            "Your property details are live"
-        );
-        emailProducer.sendEmail(request);
-
-        // Upload files to S3 and save to DB
+        // ✅ Upload files to S3 and save URLs in DB
         List<String> fileUrls = s3Service.uploadFiles(files);
         for (String url : fileUrls) {
             PropertyPhotos photo = new PropertyPhotos();
@@ -100,15 +103,13 @@ public class PropertyService {
             photo.setUrl(url);
             photosRepo.save(photo);
         }
-
-        // Add image URLs to DTO for response
         dto.setImageUrls(fileUrls);
 
         return dto;
     }
 
-	public ResponseStructure searchProperty(String city, LocalDate date) {
-		List<Property> properties = propertyRepository.searchProperty(city,date);
+	public ResponseStructure searchProperty(String name, LocalDate date) {
+		List<Property> properties = propertyRepository.searchProperty(name,date);
 		ResponseStructure<List<Property>> response = new ResponseStructure<>();
 		
 		response.setMessage("Search result");

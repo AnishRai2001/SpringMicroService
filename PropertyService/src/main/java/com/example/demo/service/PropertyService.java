@@ -3,7 +3,9 @@
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -117,6 +119,33 @@ public class PropertyService {
 		response.setData(properties);
 		
 		return response;
+	}
+	
+	public ResponseStructure<PropertyDto> findPropertyById(long id){
+		ResponseStructure<PropertyDto> response = new ResponseStructure();
+		PropertyDto dto  = new PropertyDto();
+		Optional<Property> opProp = propertyRepository.findById(id);
+		if(opProp.isPresent()) {
+			Property property = opProp.get();
+			dto.setArea(property.getArea().getName());
+			dto.setCity(property.getCity().getName());
+			dto.setState(property.getState().getName());
+			List<Rooms> rooms = property.getRooms();
+			List<RoomsDto> roomsDto = new ArrayList<>();
+			for(Rooms room:rooms) {
+				RoomsDto roomDto = new RoomsDto();
+				BeanUtils.copyProperties(room, roomDto);
+				roomsDto.add(roomDto);
+			}
+			dto.setRooms(roomsDto);
+			BeanUtils.copyProperties(property, dto);
+			response.setMessage("Matching Record");
+			response.setStatus(200);
+			response.setData(dto);
+			return response;
+		}
+		
+		return null;
 	}
 
     }

@@ -30,11 +30,11 @@ public class PropertyController {
         value = "/add-property",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<ResponseStructure<PropertyDto>> addProperty(
+        
+    )public ResponseEntity<ResponseStructure<PropertyDto>> addProperty(
             @RequestParam("property") String propertyJson,
-            @RequestParam("files") MultipartFile[] files) {
-
+            @RequestParam(value = "files", required = false) MultipartFile[] files) {
+    	 System.out.println("Received property JSON: " + propertyJson);
         ObjectMapper objectMapper = new ObjectMapper();
         PropertyDto dto;
 
@@ -52,6 +52,7 @@ public class PropertyController {
         response.setData(savedProperty);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        
     }
 
 	@GetMapping("/search")

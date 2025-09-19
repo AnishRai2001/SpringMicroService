@@ -80,22 +80,25 @@ public class PropertyService {
 
         // ✅ Save rooms and return their IDs in DTO
         List<RoomsDto> savedRoomDtos = new ArrayList<>();
-        for (RoomsDto roomsDto : dto.getRooms()) {
-            Rooms rooms = new Rooms();
-            rooms.setProperty(savedProperty);
-            rooms.setRoomType(roomsDto.getRoomType());
-            rooms.setBasePrice(roomsDto.getBasePrice());
+        if (dto.getRooms() != null) {
+            for (RoomsDto roomsDto : dto.getRooms()) {
+                Rooms rooms = new Rooms();
+                rooms.setProperty(savedProperty);
+                rooms.setRoomType(roomsDto.getRoomType());
+                rooms.setBasePrice(roomsDto.getBasePrice());
 
-            Rooms savedRoom = roomRepository.save(rooms);
+                Rooms savedRoom = roomRepository.save(rooms);
 
-            RoomsDto savedDto = new RoomsDto();
-            savedDto.setId(savedRoom.getId());
-            savedDto.setRoomType(savedRoom.getRoomType());
-            savedDto.setBasePrice(savedRoom.getBasePrice());
+                RoomsDto savedDto = new RoomsDto();
+                savedDto.setId(savedRoom.getId());
+                savedDto.setRoomType(savedRoom.getRoomType());
+                savedDto.setBasePrice(savedRoom.getBasePrice());
 
-            savedRoomDtos.add(savedDto);
+                savedRoomDtos.add(savedDto);
+            }
         }
         dto.setRooms(savedRoomDtos);
+
 
         // ✅ Upload files to S3 and save URLs in DB
         List<String> fileUrls = s3Service.uploadFiles(files);

@@ -20,6 +20,7 @@ import com.example.demo.enity.Area;
 import com.example.demo.enity.City;
 import com.example.demo.enity.Property;
 import com.example.demo.enity.PropertyPhotos;
+import com.example.demo.enity.RoomAvailability;
 import com.example.demo.enity.Rooms;
 import com.example.demo.enity.State;
 import com.example.demo.repository.AreaRepository;
@@ -150,6 +151,15 @@ public class PropertyService {
 		
 		return null;
 	}
+	public List<RoomAvailability> getTotalRoomsAvailable(long id) {
+		return availabilityRepository.findByRoomId(id);
+		
+	}
+	
+	public Rooms getRoomById(long id) {
+		return roomRepository.findById(id).get();
+	}
+	
 
     }
 

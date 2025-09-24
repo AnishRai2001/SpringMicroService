@@ -7,15 +7,19 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
+import com.stripe.param.checkout.SessionCreateParams.Builder;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class StripeService {
 
+
     @Value("${stripe.secretKey}")
     private String secretKey;
 
+   
     //stripe -API
     //-> productName , amount , quantity , currency
     //-> return sessionId and url
@@ -49,14 +53,18 @@ public class StripeService {
                             .build();
 
             // Create new session with the line items
+//            String p =
+//                    SessionCreateParams.builder()
+//                            .setMode(SessionCreateParams.Mode.PAYMENT).toString();
+//            System.out.println(p);
             SessionCreateParams params =
                     SessionCreateParams.builder()
                             .setMode(SessionCreateParams.Mode.PAYMENT)
-                            .setSuccessUrl("http://localhost:8080/success")
+                            .setSuccessUrl("http://localhost:8080/product/v1/success?session_id={CHECKOUT_SESSION_ID}")
                             .setCancelUrl("http://localhost:8080/cancel")
                             .addLineItem(lineItem)
                             .build();
-
+            
             // Create new session
             Session session = null;
             try {
@@ -64,16 +72,15 @@ public class StripeService {
             } catch (StripeException e) {
                 //log the error
             }
-	//		return null;
-			return null;
 
-//            return StripeResponse
-//                    .builder()
-//                    .status("SUCCESS")
-//                    .message("Payment session created ")
-//                    .sessionId(session.getId())
-//                    .sessionUrl(session.getUrl())
-//                    .build();
+            StripeResponse response = new StripeResponse();
+            response.setStatus("SUCCESS");
+            response.setMessage("Payment session created ");
+            response.setSessionId(session.getId());
+            response.setSessionUrl(session.getUrl());
+            return response;
+
         }
+       
 
 }

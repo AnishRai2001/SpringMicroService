@@ -19,7 +19,7 @@ import com.example.demo.dto.LoginDto;
 import com.example.demo.structure.ResponseStructure;
 
 @RestController
-@RequestMapping("/auth/v1")
+@RequestMapping("/auth")
 public class EmployeeController {
 
     @Autowired

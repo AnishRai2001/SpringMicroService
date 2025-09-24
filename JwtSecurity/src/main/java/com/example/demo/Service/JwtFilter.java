@@ -3,6 +3,7 @@ package com.example.demo.Service;
 import java.io.IOException;
 import java.security.Security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,35 +16,45 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 @Component
-public class JwtFilter extends OncePerRequestFilter{
-	
-	 private JwtService jwtService;    
-	   private CustomUserDetailsService userDetailsService; // ✅
-	    
+public class JwtFilter extends OncePerRequestFilter {
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		final String authHeader = request.getHeader("Authorization");
-		String email=null;
-		
-		if(authHeader !=null && authHeader.startsWith("Bearer")) {
-			String token= authHeader.substring(7);
-			 email=jwtService.validateTokenAndGetSubject(token);
-		}
-		 if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			 UserDetails userDetails=userDetailsService.loadUserByUsername(email);
-			 
-			  UsernamePasswordAuthenticationToken authentication =
-	                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    @Autowired
+    private JwtService jwtService;
 
-	            SecurityContextHolder.getContext().setAuthentication(authentication);
-	        }
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
-	        filterChain.doFilter(request, response);
-		}
-		
-	}
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
 
+        String path = request.getServletPath();
 
+        // Skip login & register
+        if (path.equals("/auth/login") || path.equals("/auth/register")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        final String authHeader = request.getHeader("Authorization");
+        String email = null;
+
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            email = jwtService.validateTokenAndGetSubject(token); // should return null if invalid
+        }
+
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+
+            UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+
+            SecurityContextHolder.getContext().setAuthentication(authToken);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+}

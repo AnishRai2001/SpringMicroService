@@ -4,29 +4,27 @@ spring:
 
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
-            - id: property-service
-              uri: lb://PROPERTYSERVICE
-              predicates:
-                - Path=/property/**
-              filters:
-                - RewritePath=/property/(?<segment>.*), /${segment}
+      routes:
+        - id: property-service
+          uri: lb://PROPERTYSERVICE
+          predicates:
+            - Path=/property/**
+          filters:
+            - RewritePath=/property/(?<segment>.*), /${segment}
 
-            - id: auth-service-app
-              uri: lb://JWTSECURITY
-              predicates:
-                - Path=/auth/**
-              filters:
-                - RewritePath=/auth/(?<segment>.*), /${segment}
+        - id: auth-service-app
+          uri: lb://JWTSECURITY
+          predicates:
+            - Path=/auth/**
+          filters:
+            - RewritePath=/auth/(?<segment>.*), /${segment}
 
-            - id: microservice-api-1
-              uri: lb://MICROSERVICES1
-              predicates:
-                - Path=/micro1/**
-              filters:
-                - RewritePath=/micro1/(?<segment>.*), /${segment}
+        - id: microservice-api-1
+          uri: lb://MICROSERVICES1
+          predicates:
+            - Path=/micro1/**
+          filters:
+            - RewritePath=/micro1/(?<segment>.*), /${segment}
 
 server:
   port: 5555

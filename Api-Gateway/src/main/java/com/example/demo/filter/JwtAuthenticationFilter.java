@@ -23,13 +23,16 @@ public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
     private static final String SECRET_KEY = "mysecretkey12345";
 
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
-            "/login",
-            "/register"
+            "/auth/auth/login",
+            "/auth/auth/register",
+            "/property/api/v1/property/add-property"
+           
     );
 
     private static final Map<String, List<String>> PROTECTED_ENDPOINTS_WITH_ROLES = Map.of(
-            "/micro1/message", List.of("ROLE_ADMIN")
-    );
+    	    "/micro1/message", List.of("ROLE_ADMIN")
+    	   
+    	);
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {

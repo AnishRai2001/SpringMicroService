@@ -48,24 +48,42 @@ public class BookingController {
 	    List<RoomAvailability> availableRooms = totalRoomsAvailable.getData();
 
 	    // Logic to check available rooms based on date and count
+//	    for (LocalDate date : bookingDto.getDate()) {
+//	        boolean dateAvailable = false;
+//
+//	        for (RoomAvailability room : availableRooms) {
+//	            if (room.getAvailableDate().equals(date) && room.getAvailableCount() > 0) {
+//	                dateAvailable = true;
+//	                break; // No need to check other rooms for this date
+//	            }
+//	        }
+//
+//	        if (!dateAvailable) {
+//	            messages.add("Room not available on: " + date);
+//	            apiResponse.setMessage("Sold Out");
+//	            apiResponse.setStatus(500);
+//	            apiResponse.setData(messages);
+//	            return apiResponse; // Stop here if any date is unavailable
+//	        }
+//	    }
 	    for (LocalDate date : bookingDto.getDate()) {
-	        boolean dateAvailable = false;
+	        ApiResponse<RoomAvailability> roomAvailabilityResponse =
+	            propertyClient.getRoomAvailabilityByRoomIdAndDate(
+	                bookingDto.getRoomId(),
+	                date.toString() // format as "YYYY-MM-DD"
+	            );
 
-	        for (RoomAvailability room : availableRooms) {
-	            if (room.getAvailableDate().equals(date) && room.getAvailableCount() > 0) {
-	                dateAvailable = true;
-	                break; // No need to check other rooms for this date
-	            }
-	        }
-
-	        if (!dateAvailable) {
+	        RoomAvailability roomAvailability = roomAvailabilityResponse.getData();
+	        if (roomAvailability == null || roomAvailability.getAvailableCount() <= 0) {
 	            messages.add("Room not available on: " + date);
 	            apiResponse.setMessage("Sold Out");
 	            apiResponse.setStatus(500);
 	            apiResponse.setData(messages);
-	            return apiResponse; // Stop here if any date is unavailable
+	            return apiResponse;
 	        }
 	    }
+
+
 
 	    // All dates are available → save booking
 	    Bookings bookings = new Bookings();
